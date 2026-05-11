@@ -7,7 +7,7 @@ import io.wispforest.owo.ui.component.*
 import io.wispforest.owo.ui.component.ButtonComponent.Renderer
 import io.wispforest.owo.ui.core.*
 import net.minecraft.client.gui.widget.TextFieldWidget
-import net.minecraft.client.util.math.MatrixStack
+import org.joml.Matrix4f
 import net.minecraft.entity.Entity
 import net.minecraft.item.ItemStack
 import net.minecraft.text.Style
@@ -329,11 +329,11 @@ val DiscreteSliderComponent.min: Double
     get() = min()
 val LabelComponent.textClickHandler: Function<Style, Boolean>
     get() = textClickHandler()
-val EntityComponent<*>.transform: Consumer<MatrixStack>
+val EntityComponent<*>.transform: Consumer<Matrix4f>
     get() = transform()
 val <T : Entity> EntityComponent<T>.entity
     get() = entity()
 
-fun EntityComponent<*>.transformWith(action: MatrixStack.() -> Unit) {
+fun EntityComponent<*>.transformWith(action: Matrix4f.() -> Unit) {
     transform(action)
 }

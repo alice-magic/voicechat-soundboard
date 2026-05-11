@@ -35,6 +35,6 @@ class SidebarWidget(private val current: Screen) : FlowLayout(fixed(16), content
         renderer = texture(WIDGETS, index * 16, 0, 256, 256)
         active = current !is T
         tooltipText = "soundboard.$name".translation()
-        onPress { RenderSystem.recordRenderCall { currentScreen = T::class.createInstance() } }
+        onPress { RenderSystem.queueFencedTask { currentScreen = T::class.createInstance() } }
     }
 }

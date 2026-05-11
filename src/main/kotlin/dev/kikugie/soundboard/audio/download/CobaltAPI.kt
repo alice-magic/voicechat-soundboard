@@ -229,7 +229,7 @@ object CobaltAPIV7 : CobaltAPI() {
             .withItalic(true)
             .withUnderline(true)
             .withColor(Formatting.BLUE)
-            .withClickEvent(ClickEvent(ClickEvent.Action.OPEN_URL, href))
+            .withClickEvent(ClickEvent.OpenUrl(java.net.URI.create(href)))
         return text.text().getWithStyle(style)
     }
 }

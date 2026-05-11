@@ -2,7 +2,7 @@ plugins {
     id("dev.kikugie.loom-back-compat")
     kotlin("jvm") version "2.3.21"
     kotlin("plugin.serialization") version "2.3.21"
-    id("me.fallenbreath.yamlang") version "1.4.0"
+    id("me.fallenbreath.yamlang") version "1.5.0"
 }
 
 fun prop(key: String): String = sc.properties[key]

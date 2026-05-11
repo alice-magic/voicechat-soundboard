@@ -48,9 +48,6 @@ import net.minecraft.util.Identifier
 @JvmOverloads inline fun <T : Component> overlay(child: T, build: OverlayContainer<T>.() -> Unit = {}): OverlayContainer<T> =
     Containers.overlay(child).apply(build)
 
-@JvmOverloads inline fun <T : Component> renderEffect(child: T, build: RenderEffectWrapper<T>.() -> Unit = {}): RenderEffectWrapper<T> =
-    Containers.renderEffect(child).apply(build)
-
 @JvmOverloads inline fun button(build: ButtonComponent.() -> Unit = {}): ButtonComponent =
     Components.button("".text()) {}.apply(build)
 

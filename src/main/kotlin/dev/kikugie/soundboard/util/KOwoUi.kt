@@ -6,11 +6,9 @@ import io.wispforest.owo.ui.core.OwoUIDrawContext
 import io.wispforest.owo.ui.core.ParentComponent
 import io.wispforest.owo.ui.inject.GreedyInputComponent
 import net.minecraft.client.font.TextRenderer
-import net.minecraft.client.render.RenderLayer
 import net.minecraft.text.Text
 import net.minecraft.util.Util
 import net.minecraft.util.math.MathHelper
-import org.joml.Vector2d
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
@@ -26,16 +24,7 @@ fun <T : ParentComponent> T.all(): Sequence<Component> = sequence {
 }
 
 fun OwoUIDrawContext.drawLinePrecise(x1: Double, y1: Double, x2: Double, y2: Double, thickness: Double, color: Color) {
-    val offset: Vector2d = Vector2d(x2 - x1, y2 - y1).perpendicular().normalize().mul(thickness * .5)
-
-    val buffer = vertexConsumers().getBuffer(RenderLayer.getGui())
-    val matrix = matrices.peek().positionMatrix
-    val vColor = color.argb()
-
-    buffer.vertex(matrix, (x1 + offset.x).toFloat(), (y1 + offset.y).toFloat(), 0f).color(vColor)
-    buffer.vertex(matrix, (x1 - offset.x).toFloat(), (y1 - offset.y).toFloat(), 0f).color(vColor)
-    buffer.vertex(matrix, (x2 - offset.x).toFloat(), (y2 - offset.y).toFloat(), 0f).color(vColor)
-    buffer.vertex(matrix, (x2 + offset.x).toFloat(), (y2 + offset.y).toFloat(), 0f).color(vColor)
+    drawLine(x1.toInt(), y1.toInt(), x2.toInt(), y2.toInt(), thickness, color)
 }
 
 fun OwoUIDrawContext.drawScrollingText(

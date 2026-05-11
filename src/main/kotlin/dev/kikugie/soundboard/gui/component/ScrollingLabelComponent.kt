@@ -12,9 +12,10 @@ class ScrollingLabelComponent(text: Text = Text.empty()) : LabelComponent(text) 
         center = func
     }
 
-    override fun draw(context: OwoUIDrawContext, mouseX: Int, mouseY: Int, partialTicks: Float, delta: Float) = with(context.matrices) {
-        push()
-        translate(0.0, 1 / client.window.scaleFactor, 0.0)
+    override fun draw(context: OwoUIDrawContext, mouseX: Int, mouseY: Int, partialTicks: Float, delta: Float) {
+        val matrices = context.matrices
+        matrices.pushMatrix()
+        matrices.translate(0F, (1.0 / client.window.scaleFactor).toFloat())
         context.drawScrollingText(
             textRenderer,
             text,
@@ -26,6 +27,6 @@ class ScrollingLabelComponent(text: Text = Text.empty()) : LabelComponent(text) 
             color.get().argb(),
             shadow
         )
-        pop()
+        matrices.popMatrix()
     }
 }

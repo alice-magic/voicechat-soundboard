@@ -33,7 +33,7 @@ class ScrollingButtonComponent(message: Text, onPress: Consumer<ButtonComponent>
         val tooltip = (this as ClickableWidgetAccessor).`owo$getTooltip`()
         if (this.hovered && tooltip.tooltip != null) context.drawTooltip(
             textRenderer, tooltip.tooltip!!
-                .getLines(MinecraftClient.getInstance()), HoveredTooltipPositioner.INSTANCE, mouseX, mouseY
+                .getLines(MinecraftClient.getInstance()), HoveredTooltipPositioner.INSTANCE, mouseX, mouseY, this.isFocused
         )
     }
 }
