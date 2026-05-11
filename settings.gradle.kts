@@ -25,4 +25,3 @@ stonecutter {
 }
 
 rootProject.name = "Soundboard"
-include("vc-simple", "vc-plasmo", "kowoui")

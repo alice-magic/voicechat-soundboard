@@ -21,8 +21,8 @@ deps.modmenu = "13.0.0-beta.1"
 deps.okhttp = "4.12.0"
 deps.okio = "3.9.1"
 deps.svc_api = "2.6.13"
-deps.plasmo_api = "2.1.9-SNAPSHOT"
-deps.plasmo_config = "1.0.0"
+deps.plasmo_api = "2.1.7-SNAPSHOT"
+deps.plasmo_config = "1.0.2"
 
 # Publishing channel (stable / beta / alpha)
 release = "stable"

@@ -2,7 +2,7 @@ plugins {
     id("dev.kikugie.stonecutter")
 }
 
-stonecutter active "1.21.11"
+stonecutter active "1.21.8"
 
 // See https://stonecutter.kikugie.dev/wiki/config/params
 stonecutter parameters {
@@ -12,14 +12,12 @@ stonecutter parameters {
     dependencies["fapi"] = node.project.property("deps.fabric_api") as String
 
     replacements {
-        // Identifier was renamed in 1.21.11+ (yarn) and is part of mojmap on 26.1+
-        string(current.parsed >= "1.21.11") {
-            replace("ResourceLocation", "Identifier")
-        }
-
-        // 26.1+ uses official mappings for class tweakers
+        // 26.1+ uses Mojang Mappings → AW header must declare 'official' instead of 'named'.
+        // Source-level mappings differences (Identifier ↔ ResourceLocation, package renames)
+        // are handled per-file with Stonecutter `//?` comment syntax — never blanket-replaced
+        // here, as that would corrupt the canonical source tree.
         string(current.parsed >= "26.1") {
-            replace("classTweaker v1 named", "classTweaker v1 official")
+            replace("accessWidener v2 named", "accessWidener v2 official")
         }
     }
 }
