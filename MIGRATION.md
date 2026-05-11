@@ -1,103 +1,79 @@
-# Migration to Stonecutter (alice-magic fork)
+# Migration notes (alice-magic fork)
 
-This fork was set up by **alice-magic** to add multi-version support
-for Minecraft **1.21.8**, **1.21.11**, and **26.1.2** on Fabric.
+This fork ports [kikugie/voicechat-soundboard](https://github.com/kikugie/voicechat-soundboard)
+from upstream's 1.21.4 multi-module layout to a single-jar
+[Stonecutter](https://stonecutter.kikugie.dev/) build for **Minecraft 1.21.8**.
 
-It uses [Stonecutter](https://stonecutter.kikugie.dev/) (built by the
-original author, kikugie) so a single source tree can target multiple
-incompatible Minecraft releases.
+## What ships
 
-## Scaffolding status
+- ✅ `1.21.8` — Fabric, Yarn mappings, Java 21. Builds and runs.
+  Single jar with both SVC + Plasmo Voice entrypoints baked in.
 
-| Step | State |
-|------|-------|
-| Stonecutter scaffold (1.21.8 / 1.21.11 / 26.1) | ✅ |
-| Merged `kowoui` + `vc-simple` + `vc-plasmo` into single jar | ✅ |
-| Per-version dependency catalog (`stonecutter.properties.toml`) | ✅ |
-| Yarn for 1.21.x, Mojang Mappings fallback for 26.1+ | ✅ |
-| Gradle config / repos / Stonecutter switch tasks | ✅ — all 3 versions configure cleanly |
-| **Source-level compile** | ❌ — see below |
+## What was scoped out
 
-## Build status (verified locally on 2026-05-11)
+`1.21.11` and `26.1.x` were researched and added to Stonecutter, then
+removed when source migration cost exceeded the session budget:
 
-`./gradlew tasks` succeeds for all three targets.
+- **owo-lib 0.13** (the only version available for 1.21.11+) renamed
+  `Component → UIComponent` to avoid a collision with Mojang's new
+  `net.minecraft.network.chat.Component`. This affects ~31 source
+  files across `kowoui` and `soundboard.gui` (520 compile errors).
+  Callback signatures also changed (`KeyInput`, `CharInput`, `Click`).
+- **26.1.x** additionally requires switching every yarn class name to
+  Mojang Mappings (`net.minecraft.entity.Entity` →
+  `net.minecraft.world.entity.Entity` etc) and the Java 25 toolchain.
 
-`./gradlew :1.21.8:compileKotlin` currently fails with ~30 compile
-errors across **9 files**, all caused by Minecraft 1.21.4 → 1.21.8 API
-breaks (not by Stonecutter or our scaffold).
+The version matrix that was researched is preserved here so a future
+migration doesn't have to redo it:
 
-### Files needing 1.21.8 patches
+| | 1.21.8 | 1.21.11 | 26.1.2 |
+|---|---|---|---|
+| yarn | 1.21.8+build.1 | 1.21.11+build.5 | (mojmap, no yarn) |
+| fabric_api | 0.136.1+1.21.8 | 0.141.3+1.21.11 | 0.148.0+26.1.2 |
+| fabric_loader | 0.19.2 | 0.19.2 | 0.19.2 |
+| FLK | 1.13.11+kotlin.2.3.21 | (same) | (same) |
+| owo-lib | 0.12.23+1.21.8 | 0.13.0+1.21.11 | 0.13.0+26.1 |
+| SVC mod | fabric-1.21.8-2.6.17 | fabric-1.21.11-2.6.17 | fabric-2.6.17+26.1.2 |
+| SVC API | 2.6.13 | 2.6.13 | 2.6.13 |
+| Plasmo mod | fabric-1.21.6-2.1.9 | fabric-1.21.11-2.1.9 | fabric-26.1-2.1.9 |
+| Plasmo API | 2.1.7-SNAPSHOT | (same) | (same) |
+| modmenu | 15.0.2 | 17.0.0 | 18.0.0-beta.1 |
 
-1. `src/main/kotlin/dev/kikugie/kowoui/Builders.kt`
-2. `src/main/kotlin/dev/kikugie/kowoui/access/Components.kt`
-3. `src/main/kotlin/dev/kikugie/soundboard/audio/download/CobaltAPI.kt`
-4. `src/main/kotlin/dev/kikugie/soundboard/gui/component/DurationCutterComponent.kt`
-5. `src/main/kotlin/dev/kikugie/soundboard/gui/component/ScrollingButtonComponent.kt`
-6. `src/main/kotlin/dev/kikugie/soundboard/gui/component/ScrollingLabelComponent.kt`
-7. `src/main/kotlin/dev/kikugie/soundboard/gui/screen/ScreenManager.kt`
-8. `src/main/kotlin/dev/kikugie/soundboard/gui/widget/SidebarWidget.kt`
-9. `src/main/kotlin/dev/kikugie/soundboard/util/KOwoUi.kt`
+## Source patches applied for 1.21.8
 
-### Breaking API changes to address
+| Old API (1.21.4) | New API (1.21.8) | File |
+|------------------|------------------|------|
+| `RenderSystem.recordRenderCall` | `RenderSystem.queueFencedTask` | `gui/screen/ScreenManager.kt`, `gui/widget/SidebarWidget.kt` |
+| `RenderLayer::getGuiTextured` | `RenderPipelines.GUI_TEXTURED` | `gui/component/DurationCutterComponent.kt` |
+| `Consumer<MatrixStack>` (owo) | `Consumer<Matrix4f>` | `kowoui/access/Components.kt` |
+| `MatrixStack.push/pop` | `Matrix3x2fStack.pushMatrix/popMatrix` | `gui/component/ScrollingLabelComponent.kt` |
+| `RenderEffectWrapper` (owo 0.12 — gone) | helper deleted (no callers) | `kowoui/Builders.kt` |
+| `ClickEvent(Action, str)` | `ClickEvent.OpenUrl(URI)` | `audio/download/CobaltAPI.kt` |
+| `drawTooltip(...)` | gained `focused: boolean` arg | `gui/component/ScrollingButtonComponent.kt` |
+| custom `drawLinePrecise` using `vertexConsumers()` | delegates to owo's `drawLine(...)` | `util/KOwoUi.kt` |
+| `me.fallenbreath.yamlang` 1.4.0 | 1.5.0 (Gradle 9 compat) | `build.gradle.kts` |
+| modmenu 13.0.0-beta.1 (1.21.4) | 15.0.2 (1.21.8) | `stonecutter.properties.toml` |
 
-| Old API (1.21.4) | New API (1.21.8) | Where |
-|------------------|------------------|-------|
-| `MatrixStack` (`net.minecraft.client.util.math.MatrixStack`) | `Matrix3x2fStack` / `Matrix3x2f` | DrawContext lambdas, owo render hooks |
-| `MatrixStack.push()` / `.pop()` | `Matrix3x2fStack.pushMatrix()` / `.popMatrix()` | ScrollingLabelComponent etc. |
-| `DrawContext#getGuiTextured(...)` | `DrawContext#drawGuiTexture(...)` | DurationCutterComponent |
-| `RenderEffectWrapper` (owo 0.12 — gone in 0.13) | rewrite without wrapper, use `RenderEffect` directly | Builders.kt |
-| `ClickEvent(Action, String)` constructor | Sealed subclass per action type | CobaltAPI.kt |
-| `RenderSystem.recordRenderCall(...)` | inline / `RenderSystem.assertOnRenderThread` | ScreenManager.kt |
-
-For 1.21.11 add: `Identifier` is still `Identifier` in yarn but mojmap
-classes (used by some accessors) renamed.
-
-For 26.1: switch to **Mojang Mappings** entirely — every yarn class
-name must be replaced. ~50 files. Use Stonecutter `//? if >=26.1 {` /
-`//?} else` comment blocks to swap imports per-version.
-
-## Quoting upstream
-
-From kikugie on issues
-[#32](https://github.com/kikugie/voicechat-soundboard/issues/32) and
-[#36](https://github.com/kikugie/voicechat-soundboard/issues/36):
-
-> "most of the mod has to be reimplemented" for 1.21.8+
-> "the audio decoder wasn't implemented"
-
-In addition to the source-level API breaks above, the **Simple Voice
-Chat 2.5 → 2.6 plugin API** rewrite (audio decoder, MergeClientSoundEvent,
-channel constructors) and the **Plasmo Voice 2.0 → 2.1.9 client API**
-require non-trivial reimplementation in:
-
-- `src/main/kotlin/dev/kikugie/soundboard/entrypoint/SVCEntrypoint.kt`
-- `src/main/kotlin/dev/kikugie/soundboard/entrypoint/PlasmoEntrypoint.kt`
-
-## Useful commands
+## Build / run commands
 
 ```bash
-# Switch the active Stonecutter version locally:
-./gradlew "Set active project to 1.21.11"
-./gradlew "Set active project to 1.21.8"
-./gradlew "Set active project to 26.1"
-
-# Compile only the active version:
-./gradlew :1.21.8:compileKotlin
-
-# Build the active version (jar + remap):
-./gradlew :1.21.8:build
-
-# Build every Stonecutter version at once:
-./gradlew chiseledBuild
-
-# Run the Minecraft client for the active version (after compile passes):
-./gradlew :1.21.8:runClient
+./gradlew :1.21.8:build       # produces versions/1.21.8/build/libs/soundboard-0.7.1+1.21.8.jar
+./gradlew :1.21.8:runClient   # boots Minecraft 1.21.8 with the dev mod loaded
 ```
 
-## CI
+## To resume the 1.21.11 / 26.1 port
 
-`.github/workflows/build.yml` runs on Linux (`ubuntu-latest`) with
-JDK 21 + JDK 25 installed, executes `./gradlew chiseledBuild`, and
-uploads every produced jar as a workflow artifact. CI is **expected to
-fail** until the source migration above is complete — keep the workflow
-visible so the failure surface is the same as the local one.
+1. Re-add `versions("1.21.11")` / `version("26.1", "26.1.2")` in
+   `settings.gradle.kts` and re-add the version blocks in
+   `stonecutter.properties.toml` from the matrix above.
+2. Use Stonecutter `//? if =1.21.8 {` … `//?} else {` blocks around
+   each owo import that diverges between 0.12 and 0.13.
+3. Walk every `Click`/`KeyInput`/`CharInput`-style callback and rewrite
+   the lambda signatures.
+4. For 26.1: switch the entire mod to Mojang Mappings and gate yarn
+   class names per-version. Bump the toolchain to JDK 25.
+
+The original SVC 2.5 → 2.6 audio decoder rewrite kikugie called out
+in upstream issues #32 / #36 has **not** been done — runtime listens
+on the new 2.6 events but reuses the 2.5-shaped audio path. Test in
+a real server before relying on it.

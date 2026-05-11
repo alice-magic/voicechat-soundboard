@@ -1,7 +1,20 @@
-# Soundboard
+# Soundboard (alice-magic fork)
 
-Have you ever played with a proximity voice chat mod and thought "Damn, I miss dropping a metal pipe sound effect in my Discord calls"?  
-**Well, look no further! Since now you can do it in Minecraft!**
+Fork of [kikugie/voicechat-soundboard](https://github.com/kikugie/voicechat-soundboard)
+ported to **Minecraft 1.21.8** (Fabric).
+
+> Have you ever played with a proximity voice chat mod and thought "Damn, I miss dropping a metal pipe sound effect in my Discord calls"?
+> **Well, look no further! Since now you can do it in Minecraft!**
+
+This fork ships a **single jar** that loads both the Simple Voice Chat
+and Plasmo Voice entrypoints when either backend is present at runtime
+(no separate svc/plasmo split — see `MIGRATION.md`).
+
+| MC | Loader | Build status |
+|----|--------|--------------|
+| 1.21.8 | Fabric | ✅ builds + runs |
+| 1.21.11 | Fabric | ❌ blocked on owo-lib 0.13 rebrand |
+| 26.1.x  | Fabric | ❌ blocked on owo-lib 0.13 + mojmap rewrite |
 
 ## Addons
 This mod is split for Simple Voice Chat and Plasmo Voice. Use links below to navigate to the correct one:

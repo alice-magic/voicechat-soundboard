@@ -40,27 +40,6 @@ deps.svc_mod = "fabric-1.21.8-2.6.17"
 deps.plasmo_mod = "fabric-1.21.6-2.1.9"
 deps.modmenu = "15.0.2"
 
-["1.21.11"]
-mod.mc_compat = "1.21.11"
-mod.mc_releases = ["1.21.11"]
-
-deps.fabric_api = "0.141.3+1.21.11"
-deps.yarn_mappings = "1.21.11+build.5"
-deps.owo_lib = "0.13.0+1.21.11"
-deps.owo_dep = "~0.13"
-deps.svc_mod = "fabric-1.21.11-2.6.17"
-deps.plasmo_mod = "fabric-1.21.11-2.1.9"
-deps.modmenu = "17.0.0"
-
-["26.1"]
-mod.mc_compat = "~26.1"
-mod.mc_releases = ["26.1", "26.1.1", "26.1.2"]
-
-deps.fabric_api = "0.148.0+26.1.2"
-# 26.1+ uses Mojang Mappings; loomx.applyMojangMappings() handles this in build.gradle.kts
-deps.yarn_mappings = ""
-deps.owo_lib = "0.13.0+26.1"
-deps.owo_dep = "~0.13"
-deps.svc_mod = "fabric-2.6.17+26.1.2"
-deps.plasmo_mod = "fabric-26.1-2.1.9"
-deps.modmenu = "18.0.0-beta.1"
+# 1.21.11 + 26.1 targets removed — owo-lib 0.13 rebrand (Component → UIComponent)
+# requires rewriting ~31 source files (520 compile errors). See MIGRATION.md for the
+# version matrix that was researched and the dependency versions you'd need.
