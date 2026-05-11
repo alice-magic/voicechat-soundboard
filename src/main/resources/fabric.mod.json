@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "soundboard-core",
+  "provides": [
+    "soundboard"
+  ],
+  "version": "${version}",
+  "name": "Soundboard Core",
+  "description": "Shared functionality for the Soundboard mod",
+  "authors": [
+    "KikuGie"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/project/voicechat-soundboard",
+    "sources": "https://github.com/kikugie/voicechat-soundboard"
+  },
+  "license": "GPLv3",
+  "icon": "assets/soundboard/icon.png",
+  "environment": "client",
+  "mixins": [
+    {
+      "environment": "client",
+      "config": "soundboard.mixins.json"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.15",
+    "minecraft": "${minecraft}",
+    "fabric-language-kotlin": "${flk}",
+    "owo-lib": "${owolib}",
+    "fabric-api": "*"
+  },
+  "accessWidener": "soundboard.accesswidener"
+}
